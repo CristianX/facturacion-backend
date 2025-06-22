@@ -1,6 +1,7 @@
 package com.cristianx.backend_facturacion.service;
 
 import com.cristianx.backend_facturacion.models.Factura;
+import com.cristianx.backend_facturacion.producer.FacturaProducer;
 import com.cristianx.backend_facturacion.repository.FacturaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,9 @@ public class FacturaServiceImpl implements FacturaService {
     @Autowired
     private FacturaRepository facturaRepository;
 
+    @Autowired
+    private FacturaProducer facturaProducer;
+
     @Override
     public List<Factura> findAll() {
         return facturaRepository.findAll();
@@ -26,7 +30,9 @@ public class FacturaServiceImpl implements FacturaService {
 
     @Override
     public Factura save(Factura factura) {
-        return facturaRepository.save(factura);
+        Factura saved = facturaRepository.save(factura);
+        facturaProducer.enviarFacturaCreada(saved);
+        return saved;
     }
 
     @Override
