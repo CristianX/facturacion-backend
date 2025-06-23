@@ -3,6 +3,7 @@ package com.cristianx.backend_facturacion.service;
 import com.cristianx.backend_facturacion.models.Usuario;
 import com.cristianx.backend_facturacion.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,6 +11,9 @@ import java.util.Optional;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -31,6 +35,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario save(Usuario usuario) {
+        // Encriptar la contraseña antes de guardar
+        usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
         return usuarioRepository.save(usuario);
     }
 
