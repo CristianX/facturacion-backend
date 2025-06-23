@@ -1,5 +1,6 @@
 package com.cristianx.backend_facturacion.controller;
 
+import com.cristianx.backend_facturacion.dto.ClienteDTO;
 import com.cristianx.backend_facturacion.models.Cliente;
 import com.cristianx.backend_facturacion.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,32 @@ public class ClienteController {
     @Autowired
     private ClienteService clienteService;
 
+    // Convertir Cliente a ClienteDTO
+    private ClienteDTO toDTO(Cliente cliente) {
+        return new ClienteDTO(
+            cliente.getId(),
+            cliente.getNombre(),
+            cliente.getEmail(),
+            cliente.getDireccion()
+        );
+    }
+
+    // Convertir ClienteDTO a Cliente
+    private Cliente toEntity(ClienteDTO dto) {
+        Cliente cliente = new Cliente();
+        cliente.setId(dto.getId());
+        cliente.setNombre(dto.getNombre());
+        cliente.setEmail(dto.getEmail());
+        cliente.setDireccion(dto.getDireccion());
+        return cliente;
+    }
+
     @GetMapping
-    public List<Cliente> getAllClientes() {
-        return clienteService.findAll();
+    public List<ClienteDTO> getAllClientes() {
+        return clienteService.findAll()
+                .stream()
+                .map(this::toDTO)
+                .toList();
     }
 
     @GetMapping("/{id}")
@@ -29,8 +53,10 @@ public class ClienteController {
     }
 
     @PostMapping
-    public Cliente createCliente(@RequestBody Cliente cliente) {
-        return clienteService.save(cliente);
+    public ClienteDTO createCliente(@RequestBody ClienteDTO clienteDTO) {
+        Cliente cliente = toEntity(clienteDTO);
+        Cliente saved = clienteService.save(cliente);
+        return toDTO(saved);
     }
 
     @PutMapping("/{id}")
